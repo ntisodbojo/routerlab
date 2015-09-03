@@ -27,7 +27,7 @@ Vi börjar med att installera och konfigurera dhcpservern i happyrouter
 Efter att jag hade testat såg min konfigurationsfil ut så här
 
     ddns-update-style none;
-    option domain-name-servers 10.0.2.3;
+    option domain-name-servers 8.8.8.8; # goggle nameserver
     default-lease-time 600;
     max-lease-time 7200;
     log-facility local7;
@@ -55,7 +55,7 @@ Om den inte vill starta, kan ni titta i syslogen för fel, tail ger er sista rad
 
    vagrant@happyrouter:~$ sudo tail /var/log/syslog
 
-## Nu ska vi testa dhcspservern från klienter och kola stt det fungerar.
+## Nu ska vi testa dhcspservern från olika klienter och kolla att det fungerar.
 
 Vi börjar med den virtuella happyclient
 
@@ -99,31 +99,53 @@ Kamrat borde få en ny ip-adress från vår dhcpserver.
 
 ## Happyrouter routing
 
+Vi måste slå på ip_forward för vpr router och ändra i [ip tabellerna](https://help.ubuntu.com/community/IptablesHowTo), 
+ip tabeller är lite komplext och och inget ni behöver kunna utan till.
 
 
 ### TODO write instructions
 
-Våra användaresom får ip addresser av oss kanske inte blir så glada när dom upptäckaer att dom inta har internet.
-Det måste vi fixa till.
+gå till happyroutern och kör följande kommandon i en terminal
 
 sudo iptables -A FORWARD -o eth0 -i eth1 -s 192.168.0.0/24 -m conntrack --ctstate NEW -j ACCEPT
 sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo iptables -t nat -F POSTROUTING
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
-sudo sh -c "iptables-save > /etc/iptables.rules"
+Ni kan se era aktuella regler med 
 
-pre-up iptables-restore < /etc/iptables.rules
+	sudo iptables --list
+
+Om ni startar om server kommer dom här och försvinna så vi måste lagra dom, iptables har inge konfigurationsfil men vi kan spara inställningaran i en fil med
+
+	sudo sh -c "iptables-save > /etc/iptables.rules"
+	
+	
+Nu måste vi ladda in dom varje gång datorn startar. Ett sätt är att lägga det i konfiguratione för nätverkskortet så varje gång eth1 kommer upp laddas iptabellerna
+
+öppna `/etc/network/interfaces`
+
+och lägg till en rad med pre-up i iface eth1 ..
+
+	auto eth1
+	iface eth1 inet static
+      		address 192.168.0.2
+      		netmask 255.255.255.0
+      		pre-up iptables-restore < /etc/iptables.rules
+
+
+Vi måste också tala om för systemet att skicka vidare ip trafiken.
+
+Det gör vi genom att sätta ip_foward till 1, öppna `/etc/sysctl.conf ` och hitta  raden `#net.ipv4.ip_forward=1`
+och ta bort kommentaren
 
 
 
-sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
+För att slippa starat om datorn  kan vi ändra konfigurationen under körning genom att sätta  `/proc/sys/net/ipv4/ip_forward` från 0 till 1
+
+	sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 
-
-/etc/sysctl.conf 
-
-net.ipv4.ip_forward=1
 
 
 
