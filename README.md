@@ -103,7 +103,7 @@ Vi måste slå på ip_forward för vpr router och ändra i [ip tabellerna](https
 ip tabeller är lite komplext och och inget ni behöver kunna utan till.
 
 
-### TODO write instructions
+### Happyrouter som  omkopplare
 
 gå till happyroutern och kör följande kommandon i en terminal
 
@@ -141,11 +141,19 @@ och ta bort kommentaren
 
 
 
-För att slippa starat om datorn  kan vi ändra konfigurationen under körning genom att sätta  `/proc/sys/net/ipv4/ip_forward` från 0 till 1
+För att slippa starta om datorn  kan vi ändra konfigurationen under körning genom att sätta  `/proc/sys/net/ipv4/ip_forward` från 0 till 1
 
 	sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 
+
+### Testa på klienten
+
+	#### TODO  10.0.2.15 på virtuella
+	
+	#### TODO vad händer med den fysiska, slå wifi och testa ...
+	
+	#### Be eleverna hjälpa mig att testa och skriva....
 
 
 
