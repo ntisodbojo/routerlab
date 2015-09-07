@@ -107,10 +107,10 @@ ip tabeller är lite komplext och och inget ni behöver kunna utan till.
 
 gå till happyroutern och kör följande kommandon i en terminal
 
-sudo iptables -A FORWARD -o eth0 -i eth1 -s 192.168.0.0/24 -m conntrack --ctstate NEW -j ACCEPT
-sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-sudo iptables -t nat -F POSTROUTING
-sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+	sudo iptables -A FORWARD -o eth0 -i eth1 -s 192.168.0.0/24 -m conntrack --ctstate NEW -j ACCEPT
+	sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+	sudo iptables -t nat -F POSTROUTING
+	sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 Ni kan se era aktuella regler med 
 
